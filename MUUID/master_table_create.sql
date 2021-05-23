@@ -10,3 +10,4 @@ CREATE TABLE `master` (
   UNIQUE KEY `id_UNIQUE` (`Id`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
