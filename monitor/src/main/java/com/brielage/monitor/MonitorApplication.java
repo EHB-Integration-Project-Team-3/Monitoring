@@ -34,15 +34,8 @@ public class MonitorApplication
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
 
-                channel.queueDeclare(
-                        queueName,
-                        true,
-                        false,
-                        false,
-                        null);
-
                 boolean autoAck = false;
-                String consumerTag = "myConsumerTag";
+                String consumerTag = "heartbeatConsumer";
 
                 //noinspection ConstantConditions
                 channel.basicConsume(queueName, autoAck, consumerTag,
@@ -60,6 +53,7 @@ public class MonitorApplication
 
                                 System.out.println("deliveryTag: " + deliveryTag);
                                 String b = new String(body);
+                                //System.out.println(b);
                                 // remove crap otherwise it errors
                                 b = b.replace("\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
                                 System.out.println(b);
@@ -71,7 +65,7 @@ public class MonitorApplication
 
                                 // uncomment when we actually do things with the message
                                 // so that it gets removed from queue
-                                //channel.basicAck(deliveryTag, false);
+                                channel.basicAck(deliveryTag, false);
                             }
                         });
 
