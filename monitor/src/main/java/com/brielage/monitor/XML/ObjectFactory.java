@@ -6,9 +6,7 @@
 //
 
 
-package com.brielage.monitor;
-
-import com.brielage.monitor.Heartbeat;
+package com.brielage.monitor.XML;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

@@ -6,7 +6,7 @@
 //
 
 
-package com.brielage.monitor;
+package com.brielage.monitor.XML;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
