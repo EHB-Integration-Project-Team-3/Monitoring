@@ -10,7 +10,7 @@ public class ConsumerFactory {
                         boolean autoAck)
             throws SAXException {
 
-        switch (what.toLowerCase()) {
+        switch (what) {
             case "user":
                 return new ConsumerUser(channel, queueName, autoAck, what);
             case "heartbeat":
