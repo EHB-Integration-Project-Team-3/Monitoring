@@ -2,8 +2,6 @@ package com.brielage.monitor;
 
 import com.brielage.monitor.Consumer.Consumer;
 import com.brielage.monitor.Consumer.ConsumerFactory;
-import com.brielage.monitor.Consumer.ConsumerHeartbeat;
-import com.brielage.monitor.Consumer.ConsumerUser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -12,13 +10,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-@SuppressWarnings({"BusyWait", "ConstantConditions"})
+//import java.util.ArrayList;
+//import java.util.List;
+
+@SuppressWarnings({"BusyWait", "ConstantConditions", "MismatchedQueryAndUpdateOfCollection", "InfiniteLoopStatement"})
 @SpringBootApplication
 public class MonitorApplication
         implements CommandLineRunner {
@@ -41,7 +40,6 @@ public class MonitorApplication
         factory.setHost("10.3.17.61");
         factory.setPort(5672);
 
-        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 Connection connection = factory.newConnection();
@@ -50,21 +48,23 @@ public class MonitorApplication
                 Thread.sleep(500);
 
                 ConsumerFactory consumerFactory = new ConsumerFactory();
-                List<Consumer> consumers = new ArrayList<>();
+                //List<Consumer> consumers = new ArrayList<>();
                 boolean autoAck = false;
 
                 for (Map.Entry<String, String> e : consumersStartData.entrySet()) {
                     System.out.println("make " + e.getKey());
                     Consumer consumer = consumerFactory.get(e.getKey(), channel, e.getValue(), autoAck);
                     consumer.start();
-                    consumers.add(consumer);
+                    //consumers.add(consumer);
                 }
 
                 // don't keep making consumers when one is finished with the messages already in
                 // queue
-                //channel.basicCancel(consumerTag);
+                //noinspection StatementWithEmptyBody
                 while (channel.isOpen()) {
                 }
+
+                //channel.basicCancel(consumerTag);
             } catch (IOException | TimeoutException e) {
                 e.printStackTrace();
                 Thread.sleep(10000);

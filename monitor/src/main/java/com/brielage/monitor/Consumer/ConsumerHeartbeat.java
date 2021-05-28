@@ -28,7 +28,8 @@ public class ConsumerHeartbeat extends Consumer {
                     public void handleDelivery(String consumerTag,
                                                Envelope envelope,
                                                AMQP.BasicProperties properties,
-                                               byte[] body) {
+                                               byte[] body)
+                            throws IOException {
                         // not needed atm
                         //String routingKey = envelope.getRoutingKey();
                         //String contentType = properties.getContentType();
@@ -49,12 +50,10 @@ public class ConsumerHeartbeat extends Consumer {
                                 //"<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
                         System.out.println(validateXML(b));
                         //System.out.println(b);
-                        /*System.out.println(b);
-                        System.out.println("\n\n");
 
                         XmlMapper mapper = new XmlMapper();
                         Heartbeat hb = mapper.readValue(b, Heartbeat.class);
-                        System.out.println(hb.toString());*/
+                        System.out.println(hb.toString());
 
                         // uncomment when we actually do things with the message
                         // so that it gets removed from queue
