@@ -41,6 +41,11 @@ public abstract class Consumer extends Thread {
         return XSDValidator.validate(schema, xmlString);
     }
 
+    abstract void process(String xmlString)
+            throws IOException;
+
+    abstract void log(String value);
+
     @Override
     public String toString() {
         return "Consumer{" +

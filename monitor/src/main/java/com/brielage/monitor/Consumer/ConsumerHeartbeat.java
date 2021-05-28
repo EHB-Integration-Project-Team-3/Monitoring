@@ -8,6 +8,8 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class ConsumerHeartbeat extends Consumer {
@@ -30,31 +32,45 @@ public class ConsumerHeartbeat extends Consumer {
                                                AMQP.BasicProperties properties,
                                                byte[] body)
                             throws IOException {
-                        // not needed atm
-                        //String routingKey = envelope.getRoutingKey();
-                        //String contentType = properties.getContentType();
-                        //long deliveryTag = envelope.getDeliveryTag();
-
-                        //System.out.println("deliveryTag: " + deliveryTag);
-
-                        String b = new String(body);
                         // remove crap otherwise it errors
-                        b = b.replace("\uFEFF", "");
-                                //"<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
-                        boolean validated = validateXML(b);
+                        // "\uFEFF" is a byte order mark, we get it from the message
+                        // (not a problem on the sender side)
+                        String bodyString = new String(body).replace("\uFEFF", "");
+                        boolean validated = validateXML(bodyString);
 
                         System.out.println(validated);
 
-                        if(validated) {
-                            XmlMapper mapper = new XmlMapper();
-                            Heartbeat hb = mapper.readValue(b, Heartbeat.class);
-                            System.out.println(hb.toString());
+                        if (validated) {
+                            process(bodyString);
                         }
 
-                        // uncomment when we actually do things with the message
-                        // so that it gets removed from queue
-                        //channel.basicAck(deliveryTag, false);
+                        channel.basicAck(envelope.getDeliveryTag(), false);
                     }
                 });
+    }
+
+    @Override
+    void process(String xmlString)
+            throws IOException {
+        System.out.println("processing");
+        XmlMapper mapper = new XmlMapper();
+        Heartbeat heartbeat = mapper.readValue(xmlString, Heartbeat.class);
+        System.out.println(heartbeat.toString());
+
+        log(heartbeat.toString());
+    }
+
+    @Override
+    void log(String value) {
+        System.out.println("logging");
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter("/data/heartbeat.txt", true))) {
+            writer.append(value);
+            writer.newLine();
+            writer.close();
+            System.out.println("written");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
