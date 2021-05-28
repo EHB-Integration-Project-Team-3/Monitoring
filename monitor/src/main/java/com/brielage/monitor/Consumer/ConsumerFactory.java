@@ -10,13 +10,18 @@ public class ConsumerFactory {
                         boolean autoAck)
             throws SAXException {
 
+        //noinspection SwitchStatementWithTooFewBranches
         switch (what) {
+            /*
             case "user":
                 return new ConsumerUser(channel, queueName, autoAck, what);
+            */
             case "heartbeat":
                 return new ConsumerHeartbeat(channel, queueName, autoAck, what);
+            /*
             case "event":
                 return new ConsumerEvent(channel, queueName, autoAck, what);
+            */
             default:
                 throw new IllegalArgumentException();
         }

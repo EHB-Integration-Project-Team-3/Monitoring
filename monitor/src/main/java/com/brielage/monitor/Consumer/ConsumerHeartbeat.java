@@ -33,8 +33,8 @@ public class ConsumerHeartbeat extends Consumer {
                         // not needed atm
                         //String routingKey = envelope.getRoutingKey();
                         //String contentType = properties.getContentType();
+                        //long deliveryTag = envelope.getDeliveryTag();
 
-                        long deliveryTag = envelope.getDeliveryTag();
                         //System.out.println("deliveryTag: " + deliveryTag);
 
                         String b = new String(body);
