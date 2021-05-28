@@ -57,14 +57,14 @@ public class ConsumerHeartbeat extends Consumer {
         Heartbeat heartbeat = mapper.readValue(xmlString, Heartbeat.class);
         System.out.println(heartbeat.toString());
 
-        log(heartbeat.toString());
+        log(heartbeat.toString(), heartbeat.getHeader().getSource());
     }
 
     @Override
-    void log(String value) {
+    void log(String value, String source) {
         System.out.println("logging");
         try (BufferedWriter writer = new BufferedWriter(
-                new FileWriter("/data/heartbeat.txt", true))) {
+                new FileWriter("/data/heartbeat-" + source + ".txt", true))) {
             writer.append(value);
             writer.newLine();
             writer.close();
