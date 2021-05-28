@@ -34,26 +34,22 @@ public class ConsumerHeartbeat extends Consumer {
                         //String routingKey = envelope.getRoutingKey();
                         //String contentType = properties.getContentType();
 
-                        //System.out.println("hearbeat");
-
                         long deliveryTag = envelope.getDeliveryTag();
-
                         //System.out.println("deliveryTag: " + deliveryTag);
+
                         String b = new String(body);
-                        //System.out.println(b);
-
-
-                        //System.out.println(b);
-
                         // remove crap otherwise it errors
                         b = b.replace("\uFEFF", "");
                                 //"<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
-                        System.out.println(validateXML(b));
-                        //System.out.println(b);
+                        boolean validated = validateXML(b);
 
-                        XmlMapper mapper = new XmlMapper();
-                        Heartbeat hb = mapper.readValue(b, Heartbeat.class);
-                        System.out.println(hb.toString());
+                        System.out.println(validated);
+
+                        if(validated) {
+                            XmlMapper mapper = new XmlMapper();
+                            Heartbeat hb = mapper.readValue(b, Heartbeat.class);
+                            System.out.println(hb.toString());
+                        }
 
                         // uncomment when we actually do things with the message
                         // so that it gets removed from queue
