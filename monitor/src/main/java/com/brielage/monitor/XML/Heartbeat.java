@@ -72,8 +72,8 @@ public class Heartbeat {
 
     @Override
     public String toString() {
-        return "timeStamp:" + timeStamp + "; " +
-                "source:" + getHeader().getSource() + "; " +
-                "status:" + getHeader().getStatus();
+        return "timestamp;" + timeStamp + "; " +
+                "source;" + getHeader().getSource() + "; " +
+                "status;" + getHeader().getStatus();
     }
 }
