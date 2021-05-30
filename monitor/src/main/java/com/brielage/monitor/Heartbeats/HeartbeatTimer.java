@@ -22,9 +22,9 @@ public class HeartbeatTimer
     private final HashMap<String, String> emailAdressen = new HashMap<>();
 
     {
-        emailAdressen.put("canvas", "jenswielfaert@gmail.com");
-        emailAdressen.put("frontend", "jenswielfaert@gmail.com");
-        emailAdressen.put("planning", "jenswielfaert@gmail.com");
+        emailAdressen.put("canvas", "canvas@ad.min");
+        emailAdressen.put("frontend", "frontend@ad.min");
+        emailAdressen.put("planning", "planning@ad.min");
     }
 
     private final HashMap<String, Boolean> emailSent = new HashMap<>();
