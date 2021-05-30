@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 public enum HeartbeatLogger {
     ;
 
-    public static void logAppend(String source,
-                                 String value) {
+    public static void logAppend(String source, String value) {
         try (BufferedWriter writer = new BufferedWriter(
                 new FileWriter("/data/heartbeat-" + source + ".txt", true))) {
             writer.append(value);

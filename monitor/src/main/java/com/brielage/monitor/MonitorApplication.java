@@ -24,8 +24,7 @@ public class MonitorApplication
     }
 
     @Override
-    public void run(String... args)
-            throws Exception {
+    public void run(String... args) throws Exception {
         Map<String, String> consumersStartData = new HashMap<>();
 
         //consumersStartData.put("event", "to-monitoring_event-queue");
@@ -68,6 +67,8 @@ public class MonitorApplication
                 //noinspection StatementWithEmptyBody
                 while (channel.isOpen()) {
                 }
+
+                //channel.basicCancel(consumerTag);
             } catch (IOException | TimeoutException e) {
                 e.printStackTrace();
                 Thread.sleep(10000);
