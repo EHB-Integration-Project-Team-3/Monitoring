@@ -1,36 +1,26 @@
 package com.brielage.monitor;
 
-import com.brielage.monitor.Consumer.Consumer;
-import com.brielage.monitor.Consumer.ConsumerFactory;
-import com.brielage.monitor.Heartbeats.HeartbeatTimer;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.fasterxml.jackson.xml.XmlMapper;
+import com.rabbitmq.client.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-@SuppressWarnings({"BusyWait", "ConstantConditions", "MismatchedQueryAndUpdateOfCollection", "InfiniteLoopStatement"})
+@SuppressWarnings("BusyWait")
 @SpringBootApplication
 public class MonitorApplication
         implements CommandLineRunner {
+    private final static String queueName = "to-monitoring_heartbeat-queue";
+
     public static void main(String[] args) {
         SpringApplication.run(MonitorApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-        Map<String, String> consumersStartData = new HashMap<>();
-
-        //consumersStartData.put("event", "to-monitoring_event-queue");
-        consumersStartData.put("heartbeat", "to-monitoring_heartbeat-queue");
-        //consumersStartData.put("user", "to-monitoring_user-queue");
-
         ConnectionFactory factory = new ConnectionFactory();
 
         factory.setUsername("guest");
@@ -38,35 +28,52 @@ public class MonitorApplication
         factory.setHost("10.3.17.61");
         factory.setPort(5672);
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
 
-                Thread.sleep(500);
+                channel.queueDeclare(
+                        queueName,
+                        true,
+                        false,
+                        false,
+                        null);
 
-                ConsumerFactory consumerFactory = new ConsumerFactory();
                 boolean autoAck = false;
-                boolean timer = false;
+                String consumerTag = "myConsumerTag";
 
-                for (Map.Entry<String, String> e : consumersStartData.entrySet()) {
-                    Consumer consumer = consumerFactory.get(e.getKey(), channel, e.getValue(), autoAck);
-                    consumer.start();
+                //noinspection ConstantConditions
+                channel.basicConsume(queueName, autoAck, consumerTag,
+                        new DefaultConsumer(channel) {
+                            @Override
+                            public void handleDelivery(String consumerTag,
+                                                       Envelope envelope,
+                                                       AMQP.BasicProperties properties,
+                                                       byte[] body)
+                                    throws IOException {
+                                // not needed atm
+                                //String routingKey = envelope.getRoutingKey();
+                                //String contentType = properties.getContentType();
+                                long deliveryTag = envelope.getDeliveryTag();
 
-                    if (!timer) {
-                        if (e.getKey().equals("heartbeat")) {
-                            HeartbeatTimer hbtimer = new HeartbeatTimer();
-                            hbtimer.start();
-                            timer = true;
-                        }
-                    }
-                }
+                                System.out.println("deliveryTag: " + deliveryTag);
+                                String b = new String(body);
+                                // remove crap otherwise it errors
+                                b = b.replace("\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
+                                System.out.println(b);
+                                System.out.println("\n\n");
 
-                // don't keep making consumers when one is finished with the messages already in
-                // queue
-                //noinspection StatementWithEmptyBody
-                while (channel.isOpen()) {
-                }
+                                XmlMapper mapper = new XmlMapper();
+                                Heartbeat hb = mapper.readValue(b, Heartbeat.class);
+                                System.out.println(hb.toString());
+
+                                // uncomment when we actually do things with the message
+                                // so that it gets removed from queue
+                                //channel.basicAck(deliveryTag, false);
+                            }
+                        });
 
                 //channel.basicCancel(consumerTag);
             } catch (IOException | TimeoutException e) {
