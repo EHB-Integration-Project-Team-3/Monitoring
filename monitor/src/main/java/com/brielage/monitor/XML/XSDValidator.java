@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 public enum XSDValidator {
-    @SuppressWarnings("unused")
-    INSTANCE;
+    ;
 
     private static final SchemaFactory schemaFactory =
             SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
