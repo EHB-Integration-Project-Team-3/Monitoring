@@ -70,6 +70,14 @@ public class Heartbeat {
         }
     }
 
+    public String getSource(){
+        return header.source;
+    }
+
+    public String getStatus(){
+        return header.status;
+    }
+
     @Override
     public String toString() {
         return "timestamp;" + timeStamp + "; " +
