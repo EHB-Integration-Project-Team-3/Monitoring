@@ -44,7 +44,7 @@ public abstract class Consumer extends Thread {
     abstract void process(String xmlString)
             throws IOException;
 
-    abstract void log(String value, String source);
+    abstract void log(Object object) throws IOException;
 
     @Override
     public String toString() {

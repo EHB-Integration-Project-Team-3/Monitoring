@@ -2,6 +2,7 @@ package com.brielage.monitor;
 
 import com.brielage.monitor.Consumer.Consumer;
 import com.brielage.monitor.Consumer.ConsumerFactory;
+import com.brielage.monitor.Heartbeats.HeartbeatTimer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -13,9 +14,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-
-//import java.util.ArrayList;
-//import java.util.List;
 
 @SuppressWarnings({"BusyWait", "ConstantConditions", "MismatchedQueryAndUpdateOfCollection", "InfiniteLoopStatement"})
 @SpringBootApplication
@@ -48,14 +46,20 @@ public class MonitorApplication
                 Thread.sleep(500);
 
                 ConsumerFactory consumerFactory = new ConsumerFactory();
-                //List<Consumer> consumers = new ArrayList<>();
                 boolean autoAck = false;
+                boolean timer = false;
 
                 for (Map.Entry<String, String> e : consumersStartData.entrySet()) {
-                    System.out.println("make " + e.getKey());
                     Consumer consumer = consumerFactory.get(e.getKey(), channel, e.getValue(), autoAck);
                     consumer.start();
-                    //consumers.add(consumer);
+
+                    if (!timer) {
+                        if (e.getKey().equals("heartbeat")) {
+                            HeartbeatTimer hbtimer = new HeartbeatTimer();
+                            hbtimer.start();
+                            timer = true;
+                        }
+                    }
                 }
 
                 // don't keep making consumers when one is finished with the messages already in
