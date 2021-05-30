@@ -1,12 +1,14 @@
 package com.brielage.monitor.Heartbeats;
 
 import com.brielage.monitor.Elastic.ElasticRequest;
+import com.brielage.monitor.Mail.MailSender;
 import com.brielage.monitor.XML.Heartbeat;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HeartbeatTimer
@@ -16,6 +18,22 @@ public class HeartbeatTimer
             "frontend",
             "planning"
     };
+
+    private final HashMap<String, String> emailAdressen = new HashMap<>();
+
+    {
+        emailAdressen.put("canvas", "jenswielfaert@gmail.com");
+        emailAdressen.put("frontend", "jenswielfaert@gmail.com");
+        emailAdressen.put("planning", "jenswielfaert@gmail.com");
+    }
+
+    private final HashMap<String, Boolean> emailSent = new HashMap<>();
+
+    {
+        emailSent.put("canvas", false);
+        emailSent.put("frontend", false);
+        emailSent.put("planning", false);
+    }
 
     @Override
     public void run() {
@@ -29,26 +47,33 @@ public class HeartbeatTimer
             try {
                 //noinspection BusyWait
                 sleep(1000);
-
                 for (String source : sources) {
                     HeartbeatCollector.removeAllButLastHeartbeat(source);
 
                     entry = getLatestEntry(source);
                     now = LocalDateTime.now();
 
-                    if (entry == null) //HeartbeatLogger.randomLog("null " + source);
+                    if (entry == null) {
                         log(source, makeHeartbeatOffline(source, now));
-                    else {
+
+                        if (!emailSent.get(source)) {
+                            sendMail(source);
+                            emailSent.put(source, true);
+                        }
+                    } else {
                         latestDateTime = entry.getKey();
 
                         epochLatest = latestDateTime.atZone(zoneId).toEpochSecond();
                         epochNow = now.atZone(zoneId).toEpochSecond();
 
-                        //HeartbeatLogger.randomLog(epochLatest, epochNow);
-
                         if (epochLatest < epochNow - 1) {
                             log(source, makeHeartbeatOffline(source, now));
-                        }
+
+                            if (epochLatest < epochNow - 10 && !emailSent.get(source)) {
+                                sendMail(source);
+                                emailSent.put(source, true);
+                            }
+                        } else if (emailSent.get(source)) emailSent.put(source, false);
                     }
                 }
             } catch (InterruptedException | DatatypeConfigurationException | IOException e) {
@@ -58,11 +83,11 @@ public class HeartbeatTimer
     }
 
     private Map.Entry<LocalDateTime, Heartbeat> getLatestEntry(String source) {
-        //HeartbeatLogger.randomLog(source);
         return HeartbeatCollector.getLatestHeartbeatEntry(source);
     }
 
-    private Heartbeat makeHeartbeatOffline(String source, LocalDateTime dateTime)
+    private Heartbeat makeHeartbeatOffline(String source,
+                                           LocalDateTime dateTime)
             throws DatatypeConfigurationException {
         Heartbeat.Header hbh = new Heartbeat.Header();
         Heartbeat hb = new Heartbeat();
@@ -75,10 +100,19 @@ public class HeartbeatTimer
         return hb;
     }
 
-    private void log(String source, Heartbeat heartbeat)
+    private void log(String source,
+                     Heartbeat heartbeat)
             throws IOException {
         ElasticRequest.sendToElastic("heartbeat", heartbeat);
         HeartbeatLogger.logAppend(source, heartbeat.toString());
+    }
+
+    private void sendMail(String source) {
+        String to = emailAdressen.get(source);
+        String subject = "Service " + source + " down";
+        String text = "Service " + source + " down at " + LocalDateTime.now();
+
+        MailSender.sendMail(to, subject, text);
     }
 }
 
