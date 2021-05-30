@@ -18,14 +18,14 @@ public enum XSDValidator {
 
     public static Schema getSchema(String what)
             throws SAXException {
-        System.out.println(what);
         return schemaFactory.newSchema(
                 Thread.currentThread()
                         .getContextClassLoader()
                         .getResource(what + ".xsd"));
     }
 
-    public static boolean validate(Schema schema, String xmlString) {
+    public static boolean validate(Schema schema,
+                                   String xmlString) {
         try {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(xmlString)));

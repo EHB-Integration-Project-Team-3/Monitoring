@@ -13,7 +13,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
-public class ConsumerHeartbeat extends Consumer {
+public class ConsumerHeartbeat
+        extends Consumer {
     public ConsumerHeartbeat(Channel channel,
                              String queueName,
                              boolean autoAck,
