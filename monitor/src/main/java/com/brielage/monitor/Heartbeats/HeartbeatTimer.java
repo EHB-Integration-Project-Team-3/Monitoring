@@ -53,15 +53,13 @@ public class HeartbeatTimer
                     entry = getLatestEntry(source);
                     now = LocalDateTime.now();
 
-                    if (entry == null) //HeartbeatLogger.randomLog("null " + source);
+                    if (entry == null)
                         log(source, makeHeartbeatOffline(source, now));
                     else {
                         latestDateTime = entry.getKey();
 
                         epochLatest = latestDateTime.atZone(zoneId).toEpochSecond();
                         epochNow = now.atZone(zoneId).toEpochSecond();
-
-                        //HeartbeatLogger.randomLog(epochLatest, epochNow);
 
                         if (epochLatest < epochNow - 1) {
                             log(source, makeHeartbeatOffline(source, now));
@@ -75,7 +73,6 @@ public class HeartbeatTimer
     }
 
     private Map.Entry<LocalDateTime, Heartbeat> getLatestEntry(String source) {
-        //HeartbeatLogger.randomLog(source);
         return HeartbeatCollector.getLatestHeartbeatEntry(source);
     }
 

@@ -17,7 +17,8 @@ public enum ElasticRequest {
     private static final RestHighLevelClient client = new RestHighLevelClient(
             RestClient.builder(new HttpHost("10.3.17.75", 9200, "http")));
 
-    public static void sendToElastic(String index, Heartbeat heartbeat)
+    public static void sendToElastic(String index,
+                                     Heartbeat heartbeat)
             throws IOException {
         HashMap hm = new HashMap();
 
@@ -28,7 +29,8 @@ public enum ElasticRequest {
         send(index, hm);
     }
 
-    private static void send(String index, HashMap hm)
+    private static void send(String index,
+                             HashMap hm)
             throws IOException {
         client.index(new IndexRequest(index).source(hm), RequestOptions.DEFAULT);
     }
