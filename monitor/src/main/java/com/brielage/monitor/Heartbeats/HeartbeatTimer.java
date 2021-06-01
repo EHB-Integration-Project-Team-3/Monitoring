@@ -7,6 +7,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HeartbeatTimer
@@ -17,7 +18,6 @@ public class HeartbeatTimer
             "planning"
     };
 
-<<<<<<< HEAD
     private final HashMap<String, String> emailAdressen = new HashMap<>();
 
     {
@@ -34,8 +34,6 @@ public class HeartbeatTimer
         emailSent.put("planning", false);
     }
 
-=======
->>>>>>> main
     @Override
     public void run() {
         ZoneId zoneId = ZoneId.systemDefault();
