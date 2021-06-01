@@ -17,6 +17,25 @@ public class HeartbeatTimer
             "planning"
     };
 
+<<<<<<< HEAD
+    private final HashMap<String, String> emailAdressen = new HashMap<>();
+
+    {
+        emailAdressen.put("canvas", "canvas@ipwt3.onmicrosoft.com");
+        emailAdressen.put("frontend", "frontend@ipwt3.onmicrosoft.com");
+        emailAdressen.put("planning", "planning@ipwt3.onmicrosoft.com");
+    }
+
+    private final HashMap<String, Boolean> emailSent = new HashMap<>();
+
+    {
+        emailSent.put("canvas", false);
+        emailSent.put("frontend", false);
+        emailSent.put("planning", false);
+    }
+
+=======
+>>>>>>> main
     @Override
     public void run() {
         ZoneId zoneId = ZoneId.systemDefault();
