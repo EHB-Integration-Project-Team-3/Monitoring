@@ -57,16 +57,10 @@
             <version>7.12.1</version>
         </dependency>
         <dependency>
-            <groupId>com.brielage</groupId>
-            <artifactId>monitor</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.12.1</version>
         </dependency>
-<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -84,8 +78,6 @@
             <version>3.19.0</version>
             <scope>test</scope>
         </dependency>
-=======
->>>>>>> main
     </dependencies>
 
     <build>
