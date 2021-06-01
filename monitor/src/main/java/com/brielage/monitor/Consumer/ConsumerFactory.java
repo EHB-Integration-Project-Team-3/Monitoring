@@ -3,8 +3,9 @@ package com.brielage.monitor.Consumer;
 import com.rabbitmq.client.Channel;
 import org.xml.sax.SAXException;
 
-public class ConsumerFactory {
-    public Consumer get(String what,
+public enum ConsumerFactory {
+;
+    public static Consumer get(String what,
                         Channel channel,
                         String queueName,
                         boolean autoAck)

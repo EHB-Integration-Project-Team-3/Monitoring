@@ -46,12 +46,12 @@ public class MonitorApplication
 
                 Thread.sleep(500);
 
-                ConsumerFactory consumerFactory = new ConsumerFactory();
                 boolean autoAck = false;
                 boolean timer = false;
 
                 for (Map.Entry<String, String> e : consumersStartData.entrySet()) {
-                    Consumer consumer = consumerFactory.get(e.getKey(), channel, e.getValue(), autoAck);
+                    Consumer consumer = ConsumerFactory.get(e.getKey(), channel, e.getValue(),
+                            autoAck);
                     consumer.start();
 
                     if (!timer) {
