@@ -1,6 +1,7 @@
 package com.brielage.monitor.Heartbeats;
 
 import com.brielage.monitor.Elastic.ElasticRequest;
+import com.brielage.monitor.Mail.MailSender;
 import com.brielage.monitor.XML.Heartbeat;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -53,33 +54,40 @@ public class HeartbeatTimer
                     entry = getLatestEntry(source);
                     now = LocalDateTime.now();
 
-                    if (entry == null) //HeartbeatLogger.randomLog("null " + source);
+                    if (entry == null) {
                         log(source, makeHeartbeatOffline(source, now));
-                    else {
+
+                        if (!emailSent.get(source)) {
+                            sendMail(source);
+                            emailSent.put(source, true);
+                        }
+                    } else {
                         latestDateTime = entry.getKey();
 
                         epochLatest = latestDateTime.atZone(zoneId).toEpochSecond();
                         epochNow = now.atZone(zoneId).toEpochSecond();
 
-                        //HeartbeatLogger.randomLog(epochLatest, epochNow);
-
                         if (epochLatest < epochNow - 1) {
-                            log(source, makeHeartbeatOffline(source, now));
-                        }
+                            if (epochLatest < epochNow - 10 && !emailSent.get(source)) {
+                                sendMail(source);
+                                emailSent.put(source, true);
+                            }
+                        } else if (emailSent.get(source)) emailSent.put(source, false);
                     }
                 }
             } catch (InterruptedException | DatatypeConfigurationException | IOException e) {
                 e.printStackTrace();
             }
         }
+
     }
 
     private Map.Entry<LocalDateTime, Heartbeat> getLatestEntry(String source) {
-        //HeartbeatLogger.randomLog(source);
         return HeartbeatCollector.getLatestHeartbeatEntry(source);
     }
 
-    private Heartbeat makeHeartbeatOffline(String source, LocalDateTime dateTime)
+    private Heartbeat makeHeartbeatOffline(String source,
+                                           LocalDateTime dateTime)
             throws DatatypeConfigurationException {
         Heartbeat.Header hbh = new Heartbeat.Header();
         Heartbeat hb = new Heartbeat();
@@ -92,10 +100,19 @@ public class HeartbeatTimer
         return hb;
     }
 
-    private void log(String source, Heartbeat heartbeat)
+    private void log(String source,
+                     Heartbeat heartbeat)
             throws IOException {
         ElasticRequest.sendToElastic("heartbeat", heartbeat);
         HeartbeatLogger.logAppend(source, heartbeat.toString());
+    }
+
+    private void sendMail(String source) {
+        String to = emailAdressen.get(source);
+        String subject = "Service " + source + " down";
+        String text = "Service " + source + " down at " + LocalDateTime.now();
+
+        MailSender.sendMail(to, subject, text);
     }
 }
 

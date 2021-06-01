@@ -25,15 +25,15 @@ public enum XSDValidator {
                         .getResource(what + ".xsd"));
     }
 
-    public static boolean validate(Schema schema, String xmlString) {
+    public static boolean validate(Schema schema,
+                                   String xmlString) {
         try {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(xmlString)));
+            return true;
         } catch (SAXException | IOException e) {
             e.printStackTrace();
             return false;
         }
-
-        return true;
     }
 }
