@@ -23,7 +23,7 @@ public enum HeartbeatCollector {
     }
 
     public static void addHeartbeat(Heartbeat heartbeat) {
-        heartbeats.get(heartbeat.getHeader().getSource().toLowerCase()).put(LocalDateTime.now(), heartbeat);
+        heartbeats.get(heartbeat.getSource().toLowerCase()).put(LocalDateTime.now(), heartbeat);
     }
 
     public static void removeAllButLastHeartbeat(String source) {
